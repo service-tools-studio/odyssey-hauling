@@ -1,65 +1,709 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+export default function Page() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <OdysseyHaulingPage />
+  );
+}
+
+
+import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ArrowRight,
+  Clock3,
+  Phone,
+  Star,
+  Truck,
+  Camera,
+  FileText,
+  MapPin,
+  Shield,
+  Trash2,
+  Home,
+  Sofa,
+  Package,
+  Hammer,
+  Trees,
+  Bath,
+  Send,
+  Menu,
+  X,
+} from 'lucide-react';
+
+function OdysseyHaulingPage() {
+  const pricingOptions = [
+    { label: 'Minimum fee', low: 100, high: 100, category: 'Load-based' },
+    { label: 'Half truckload', low: 150, high: 150, category: 'Load-based' },
+    { label: 'Full truckload', low: 250, high: 250, category: 'Load-based' },
+    { label: 'Full trailer load', low: 495, high: 495, category: 'Load-based' },
+    { label: 'Full truck and trailer load', low: 750, high: 750, category: 'Load-based' },
+    { label: 'Couch', low: 200, high: 200, category: 'Single items' },
+    { label: 'Mattresses', low: 65, high: 150, category: 'Single items' },
+    { label: 'Box spring', low: 65, high: 150, category: 'Single items' },
+    { label: 'Appliances', low: 75, high: 165, category: 'Single items' },
+    { label: 'Hot tubs', low: 425, high: 795, category: 'Specialty jobs' },
+    { label: 'Shed removal', low: 495, high: 495, category: 'Specialty jobs', helper: 'Basic price based on a 5\'x5\' unit' },
+  ];
+  const selectablePricingOptions = pricingOptions.filter((item) => item.label !== 'Minimum fee');
+  const minimumFee = pricingOptions.find((item) => item.label === 'Minimum fee')?.low ?? 100;
+
+  const [serviceToAdd, setServiceToAdd] = useState(selectablePricingOptions[0]?.label ?? '');
+  const [serviceItems, setServiceItems] = useState<Array<{ label: string; quantity: number }>>([]);
+  const [navOpen, setNavOpen] = useState(false);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setNavOpen(false);
+    };
+    document.documentElement.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.documentElement.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [navOpen]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const close = () => {
+      if (mq.matches) setNavOpen(false);
+    };
+    mq.addEventListener('change', close);
+    return () => mq.removeEventListener('change', close);
+  }, []);
+
+  const addServiceItem = () => {
+    if (!serviceToAdd) return;
+    setServiceItems((prev) => {
+      const existing = prev.find((item) => item.label === serviceToAdd);
+      if (existing) {
+        return prev.map((item) => (item.label === serviceToAdd ? { ...item, quantity: item.quantity + 1 } : item));
+      }
+      return [...prev, { label: serviceToAdd, quantity: 1 }];
+    });
+  };
+
+  const updateServiceQuantity = (label: string, quantity: number) => {
+    setServiceItems((prev) => prev.map((item) => (item.label === label ? { ...item, quantity: Math.max(1, quantity || 1) } : item)));
+  };
+
+  const removeServiceItem = (label: string) => {
+    setServiceItems((prev) => prev.filter((item) => item.label !== label));
+  };
+
+  const itemizedEstimate = useMemo(() => {
+    const items = serviceItems
+      .map(({ label, quantity }) => {
+        const option = pricingOptions.find((entry) => entry.label === label);
+        if (!option) return null;
+
+        return {
+          label: option.label,
+          quantity,
+          low: option.low * quantity,
+          high: option.high * quantity,
+        };
+      })
+      .filter((entry): entry is { label: string; quantity: number; low: number; high: number } => entry !== null);
+
+    const subtotalLow = items.reduce((sum, item) => sum + item.low, 0);
+    const subtotalHigh = items.reduce((sum, item) => sum + item.high, 0);
+    const low = Math.max(minimumFee, subtotalLow);
+    const high = Math.max(minimumFee, subtotalHigh);
+    return { items, subtotalLow, subtotalHigh, low, high };
+  }, [serviceItems, pricingOptions, minimumFee]);
+
+  const services = [
+    { title: 'Hauling', icon: Truck, text: 'Fast, dependable hauling for everyday cleanup, property projects, and oversized items.' },
+    { title: 'Junk Removal', icon: Trash2, text: 'Furniture, clutter, bulk trash, and unwanted items cleared out without the hassle.' },
+    { title: 'Hot Tub Removal', icon: Bath, text: 'Breakdown and haul-away for old hot tubs, with pricing based on size and access.' },
+    { title: 'Shed Removal', icon: Home, text: 'Demolition and removal for small sheds and worn-out backyard structures.' },
+    { title: 'Yard Debris', icon: Trees, text: 'Branches, brush, storm debris, leaves, and outdoor cleanup hauled away quickly.' },
+    { title: 'Clean Outs', icon: Package, text: 'Garage, storage unit, estate, rental, and move-out clean outs with clear communication.' },
+    { title: 'Small Moving Jobs', icon: Sofa, text: 'Need help moving a few items across town? We handle smaller jobs with care.' },
+    { title: 'Large Item Transport', icon: ArrowRight, text: 'Single-item and oversized-item transport for furniture, equipment, and more.' },
+    { title: 'Construction Deliveries', icon: Hammer, text: 'Pickup and delivery for materials, jobsite items, and project-related transport.' },
+  ];
+
+  const reviews = [
+    {
+      name: 'Rudy G',
+      text: 'Odyssey hauling is amazing. Briton got a job that would have taken me a week done in about 4 hours. Very professional and very polite. All around great experience!'
+    },
+    {
+      name: 'Josh Erickson',
+      text: 'Great service. Arrived on time. Followed directions and worked efficiently and took care to not damage anything while removing furniture from the house. Friendly and trustworthy crew.'
+    },
+    {
+      name: 'Chris Couch',
+      text: 'We had a bunch of scrap metal we didn’t know what to do with. These guys showed up, gave us a reasonable rate and took care of everything. One hundred percent recommend.'
+    },
+  ];
+
+  const process = [
+    {
+      number: '01',
+      title: 'Send the details',
+      icon: Camera,
+      text: 'Share your name, location, photos of the property, whether there are hazardous materials, and a general list of items or amount of debris.',
+    },
+    {
+      number: '02',
+      title: 'Schedule the job',
+      icon: Clock3,
+      text: 'Let us know when you need us there and we will coordinate a time that works for your schedule.',
+    },
+    {
+      number: '03',
+      title: 'Confirm and get it done',
+      icon: FileText,
+      text: 'Larger jobs require a signed contract with 50% down and 50% on completion. Smaller jobs are flat-rate. Minimum fee is $100.',
+    },
+  ];
+
+  const navLinks = [
+    { href: '#services', label: 'Services' },
+    { href: '#process', label: 'How it works' },
+    { href: '#quote', label: 'Quote' },
+    { href: '#contact', label: 'Get started' },
+  ];
+
+  return (
+    <main className="min-h-screen bg-[#f7f1e7] text-[#171717]">
+      <header className="sticky top-0 z-50 border-b border-black/10 bg-[#f7f1e7]/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3.5 md:gap-6 md:px-10 md:py-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4 md:flex-initial">
+            <a href="#" className="flex shrink-0 items-center outline-offset-4 transition-opacity hover:opacity-90">
+              <Image
+                src="/odyssey-hauling-transparent.png"
+                alt="Odyssey Hauling LLC"
+                width={480}
+                height={270}
+                className="h-12 w-auto sm:h-14 md:h-16"
+                priority
+              />
+            </a>
+            <span
+              className="min-w-0 text-[11px] font-semibold uppercase leading-snug tracking-[0.14em] text-[#784821] sm:text-xs md:text-sm"
+              style={{
+                fontFamily: '"Cormorant Garamond", "Cormorant Garamond Fallback", ui-serif, Georgia, "Times New Roman", serif',
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              <b>ODYSSEY HAULING LLC</b>
+            </span>
+          </div>
+
+          <nav
+            className="hidden min-w-0 flex-1 items-center justify-end gap-2 text-sm font-medium text-black/70 md:flex"
+            aria-label="Primary"
+          >
+            {navLinks.map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                className={
+                  href === '#contact'
+                    ? 'inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5'
+                    : 'shrink-0 rounded-lg px-2.5 py-2 transition-colors hover:bg-black/[0.04] hover:text-[#1b1b1b]'
+                }
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          <button
+            type="button"
+            className="-mr-1 inline-flex shrink-0 items-center justify-center rounded-xl p-2.5 text-[#171717] transition-colors hover:bg-black/[0.06] md:hidden"
+            aria-expanded={navOpen}
+            aria-controls="site-mobile-nav"
+            onClick={() => setNavOpen((o) => !o)}
+          >
+            {navOpen ? <X className="h-6 w-6" strokeWidth={1.75} /> : <Menu className="h-6 w-6" strokeWidth={1.75} />}
+            <span className="sr-only">{navOpen ? 'Close menu' : 'Open menu'}</span>
+          </button>
+        </div>
+
+        {navOpen ? (
+          <div
+            id="site-mobile-nav"
+            className="border-t border-black/10 bg-[#f2ebe0]/98 px-6 py-4 shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+          >
+            <nav className="mx-auto flex max-w-7xl flex-col gap-0.5" aria-label="Primary mobile">
+              {navLinks.map(({ href, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="rounded-xl px-3 py-3.5 text-base font-medium text-[#1b1b1b] transition-colors hover:bg-black/[0.05]"
+                  onClick={() => setNavOpen(false)}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        ) : null}
+      </header>
+
+      <section className="relative overflow-x-hidden border-b border-black/10 bg-[radial-gradient(circle_at_top,rgba(177,114,48,0.16),transparent_38%),linear-gradient(to_bottom,#f8f2e9,#f4ede2)]">
+        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,.25) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 pt-0 pb-12 md:px-10 md:pb-16 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:gap-16 lg:py-24">
+          <div className="relative order-1 flex w-full max-w-none max-lg:left-1/2 max-lg:w-screen max-lg:-translate-x-1/2 max-lg:flex-col lg:contents lg:left-auto lg:w-auto lg:translate-x-0">
+            <div className="relative isolate lg:order-2 lg:mx-auto lg:max-w-xl">
+              <Image
+                src="/odessey-hero-darkened.svg"
+                alt="Briton and truck for Odyssey Hauling LLC"
+                width={1200}
+                height={1200}
+                className="h-auto w-full max-lg:rounded-none object-contain lg:rounded-2xl"
+                priority
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-1/3 bg-gradient-to-b from-black/70 via-black/45 via-[55%] to-transparent lg:hidden"
+              />
+
+              {/* Mobile / tablet: title + blurb centered in top third of image */}
+              <div className="absolute inset-x-0 top-0 z-10 flex h-1/3 min-h-0 flex-col items-center justify-center gap-2 overflow-y-auto overscroll-contain px-4 py-2 text-center text-white lg:hidden">
+                <h1 className="w-full max-w-xl shrink-0 text-balance font-semibold tracking-tight text-[clamp(1.45rem,6.2vw,2.05rem)] leading-[1.06] text-white sm:max-w-2xl sm:text-[clamp(1.55rem,5.2vw,2.2rem)]">
+                  When you need a <span className="text-[#f2d9a8]">friend with a truck</span>.
+                </h1>
+                <p className="w-full max-w-xl shrink-0 text-[0.8125rem] leading-snug text-white/88 sm:max-w-2xl sm:text-[0.84rem]">
+                  Hauling, junk removal, specialty pickups, and clean-outs with straightforward pricing, and fast scheduling.
+                </p>
+              </div>
+            </div>
+
+            <div className="z-10 flex w-full min-w-0 shrink-0 flex-row gap-2 border-t border-black/10 bg-[#f7f1e7] px-5 py-3 sm:gap-3 md:px-10 lg:hidden">
+              <a
+                href="#quote"
+                className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#111111] px-4 py-3 text-sm font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5 sm:px-5 sm:text-base"
+              >
+                <span className="truncate">Get a quote</span>
+                <ArrowRight className="h-4 w-4 shrink-0" />
+              </a>
+              <a
+                href="#contact"
+                className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm font-medium text-[#1b1b1b] backdrop-blur transition hover:bg-white sm:px-5 sm:text-base"
+              >
+                <span className="truncate">Contact Us</span>
+                <Phone className="h-4 w-4 shrink-0" />
+              </a>
+            </div>
+
+            {/* lg+: copy column (same text as overlay; only one column visible at a time) */}
+            <div className="relative z-10 order-1 hidden lg:block">
+              <h1 className="max-w-3xl text-balance text-5xl font-semibold leading-[0.95] tracking-tight uppercase text-[#1b1b1b] sm:text-6xl lg:text-7xl">
+                When you need a <span className="text-[#8a4a17]">friend with a truck</span>.
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-black/70 sm:text-xl">
+                Hauling, junk removal, specialty pickups, and clean-outs with straightforward pricing, and fast scheduling.
+              </p>
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                <a
+                  href="#quote"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5"
+                >
+                  Get a quote
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white/80 px-6 py-4 text-base font-medium text-[#1b1b1b] backdrop-blur transition hover:bg-white"
+                >
+                  Contact Us
+                  <Phone className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <div className="max-w-2xl">
+            <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              About Odyssey
+            </div>
+            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">A reliable local team for hauling, cleanouts, and heavy lifting.</h2>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm sm:p-8">
+            <p className="text-lg leading-8 text-black/70">
+              Odyssey Hauling LLC is a reliable, locally owned hauling and junk removal service based in Beaverton, OR. We specialize in junk
+              removal, property cleanouts, and transporting large items. No job is too big or too small, and we are committed to handling every
+              job with care and efficiency. Whether you are clearing out clutter, cleaning up a property, or need a hand with heavy lifting, we
+              are here to help.
+            </p>
+            <p className="mt-5 text-lg leading-8 text-black/70">
+              We also strive to donate and recycle as much as possible. We work with different nonprofits and organizations to help give items a
+              second home.
+            </p>
+            <p className="mt-5 text-lg font-medium leading-8 text-[#1b1b1b]">
+              So if you need a friend with a truck, call Odyssey Hauling today for a free quote.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+        <div className="max-w-3xl">
+          <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+            Services
+          </div>
+          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Reliable help for heavy, bulky, messy, and awkward jobs.</h2>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-black/65">
+            Whether you need a few items gone, a full trailer load hauled away, or help moving something large, Odyssey Hauling keeps it simple.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {services.map((service) => {
+            const Icon = service.icon;
+            return (
+              <div key={service.title} className="group rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8a4a17]/10 text-[#8a4a17]">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 text-xl font-semibold">{service.title}</h3>
+                <p className="mt-3 leading-7 text-black/65">{service.text}</p>
+              </div>
+            );
+          })}
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section id="reviews" className="border-y border-black/10 bg-[#efe5d6]">
+        <div className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+                Google Reviews
+              </div>
+              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Trusted by local customers who needed it handled fast.</h2>
+            </div>
+            {/* <p className="max-w-xl text-base leading-7 text-black/65">
+              Swap these placeholders with live Google reviews when ready, or connect this section to your review data later.
+            </p> */}
+          </div>
+
+          <div className="mt-10 grid gap-5 lg:grid-cols-3">
+            {reviews.map((review) => (
+              <div key={review.name} className="rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm">
+                <div className="flex gap-1 text-[#8a4a17]">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+                <p className="mt-5 text-lg leading-8 text-black/75">“{review.text}”</p>
+                <div className="mt-6 text-sm font-medium uppercase tracking-[0.18em] text-black/50">{review.name}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <a
+              href="https://maps.app.goo.gl/41ami5wUUMZXM2xK8"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5"
+            >
+              See all reviews on Google
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="process" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+          <div>
+            <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              Process
+            </div>
+            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">A simple process from photos to pickup day.</h2>
+            <p className="mt-4 max-w-xl text-lg leading-8 text-black/65">
+              The goal is to quote quickly, schedule clearly, and make sure expectations are handled before the job starts.
+            </p>
+
+            <div className="mt-8 rounded-[1.75rem] border border-black/10 bg-[#111111] p-6 text-white shadow-lg">
+              <div className="flex items-start gap-4">
+                <Shield className="mt-1 h-5 w-5 flex-none text-[#d49a5a]" />
+                <p className="leading-7 text-white/80">
+                  For larger jobs, clients sign a contract and pay 50% at signing and 50% when the job is complete. Smaller jobs are billed at a flat rate.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-5">
+            {process.map((step) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.number} className="grid gap-4 rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm md:grid-cols-[auto_1fr] md:items-start">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8a4a17]/10 text-[#8a4a17]">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div className="text-sm font-semibold uppercase tracking-[0.2em] text-black/35 md:hidden">Step {step.number}</div>
+                  </div>
+                  <div>
+                    <div className="hidden text-sm font-semibold uppercase tracking-[0.2em] text-black/35 md:block">Step {step.number}</div>
+                    <h3 className="mt-1 text-2xl font-semibold">{step.title}</h3>
+                    <p className="mt-3 leading-8 text-black/65">{step.text}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section id="quote" className="border-y border-black/10 bg-[linear-gradient(to_bottom,#f2e7d8,#efe3d1)]">
+        <div className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+            <div>
+              <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white/80 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+                Quote Calculator
+              </div>
+              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Quick estimate tool with flat-rate pricing.</h2>
+              <p className="mt-4 max-w-xl text-lg leading-8 text-black/65">
+                This gives you a fast ballpark estimate before you send photos and job details for confirmation.
+              </p>
+
+              <div className="mt-8 rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm">
+                <h3 className="text-lg font-semibold">Flat-rate pricing guide</h3>
+                <div className="mt-5 space-y-3 text-sm text-black/70">
+                  {pricingOptions.map((item) => (
+                    <div key={item.label} className="flex items-start justify-between gap-4 border-b border-black/5 pb-3 last:border-b-0 last:pb-0">
+                      <div>
+                        <div className="font-medium text-black">{item.label}</div>
+                        {item.helper ? <div className="mt-1 text-black/55">{item.helper}</div> : null}
+                      </div>
+                      <div className="whitespace-nowrap font-semibold text-[#8a4a17]">
+                        {item.low === item.high ? `$${item.low}` : `$${item.low}–$${item.high}`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:p-8">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-sm uppercase tracking-[0.2em] text-black/40">Estimate builder</div>
+                  <h3 className="mt-2 text-2xl font-semibold">See your ballpark range</h3>
+                </div>
+                <div className="rounded-2xl bg-[#111111] px-4 py-3 text-right text-white">
+                  <div className="text-xs uppercase tracking-[0.18em] text-white/50">Minimum</div>
+                  <div className="text-lg font-semibold">${minimumFee}</div>
+                </div>
+              </div>
+
+              <div className="mt-8 grid gap-5">
+                <div className="grid gap-2">
+                  <span className="text-sm font-medium text-black/65">Service items</span>
+                  <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                    <select
+                      value={serviceToAdd}
+                      onChange={(e) => setServiceToAdd(e.target.value)}
+                      className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 text-base outline-none ring-0 transition focus:border-[#8a4a17]"
+                    >
+                      {selectablePricingOptions.map((item) => (
+                        <option key={item.label} value={item.label}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={addServiceItem}
+                      className="h-14 rounded-2xl bg-[#111111] px-5 text-sm font-medium text-white transition hover:-translate-y-0.5"
+                    >
+                      Add item
+                    </button>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-black/10 bg-[#faf7f2] p-4">
+                  {serviceItems.length === 0 ? (
+                    <p className="text-sm text-black/55">No service items selected yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {itemizedEstimate.items.map((item) => (
+                        <div key={item.label} className="grid gap-2 rounded-xl border border-black/10 bg-white p-3 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+                          <div>
+                            <div className="font-medium text-black">{item.label}</div>
+                            <div className="text-xs text-black/55">
+                              {item.low === item.high ? `$${item.low}` : `$${item.low}–$${item.high}`}
+                            </div>
+                          </div>
+                          <label className="flex items-center gap-2 text-sm text-black/65">
+                            Qty
+                            <input
+                              type="number"
+                              min={1}
+                              value={item.quantity}
+                              onChange={(e) => updateServiceQuantity(item.label, Number(e.target.value))}
+                              className="h-10 w-20 rounded-lg border border-black/10 bg-[#faf7f2] px-2 text-sm outline-none transition focus:border-[#8a4a17]"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => removeServiceItem(item.label)}
+                            className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-black/60 transition hover:bg-black/[0.05] hover:text-black"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              <div className="mt-8 rounded-[1.75rem] bg-[#111111] p-6 text-white">
+                <div className="text-sm uppercase tracking-[0.2em] text-white/50">Estimate</div>
+                <div className="mt-3 text-4xl font-semibold tracking-tight">
+                  {itemizedEstimate.low === itemizedEstimate.high
+                    ? `$${itemizedEstimate.low}`
+                    : `$${itemizedEstimate.low}–$${itemizedEstimate.high}`}
+                </div>
+                <div className="mt-4 space-y-1 text-sm text-white/75">
+                  {itemizedEstimate.items.map((item) => (
+                    <div key={item.label} className="flex items-center justify-between gap-3">
+                      <span>{item.label} x {item.quantity}</span>
+                      <span>{item.low === item.high ? `$${item.low}` : `$${item.low}–$${item.high}`}</span>
+                    </div>
+                  ))}
+                  {itemizedEstimate.items.length > 0 ? (
+                    <div className="mt-2 flex items-center justify-between border-t border-white/15 pt-2 font-medium text-white">
+                      <span>Subtotal</span>
+                      <span>
+                        {itemizedEstimate.subtotalLow === itemizedEstimate.subtotalHigh
+                          ? `$${itemizedEstimate.subtotalLow}`
+                          : `$${itemizedEstimate.subtotalLow}–$${itemizedEstimate.subtotalHigh}`}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-2 border-t border-white/15 pt-2">
+                      Minimum fee applies: ${minimumFee}
+                    </div>
+                  )}
+                </div>
+                <p className="mt-3 max-w-xl leading-7 text-white/70">
+                  Final price depends on photos, exact item count, and on-site conditions. This calculator is meant for quick ballpark pricing.
+                </p>
+              </div>
+
+              <a
+                href="#contact"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#8a4a17]"
+              >
+                Request final quote
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              Contact
+            </div>
+            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Send the details and get the job moving.</h2>
+            <p className="mt-4 max-w-xl text-lg leading-8 text-black/65">
+              The fastest way to quote is with photos, your location, and a general list of what needs to go.
+            </p>
+
+            <div className="mt-8 space-y-4">
+              {[
+                { icon: MapPin, text: 'Include your location' },
+                { icon: Camera, text: 'Attach photos of the property or items' },
+                { icon: Trash2, text: 'List what is being hauled away' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.text} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#8a4a17]/10 text-[#8a4a17]">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-black/75">{item.text}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.1)] sm:p-8">
+            <form className="grid gap-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-black/65">Full name</span>
+                  <input className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" placeholder="Your name" />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-black/65">Phone</span>
+                  <input className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" placeholder="(555) 555-5555" />
+                </label>
+              </div>
+
+              <label className="grid gap-2">
+                <span className="text-sm font-medium text-black/65">Location</span>
+                <input className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" placeholder="City or job address" />
+              </label>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-black/65">When do you need it scheduled?</span>
+                  <input type="date" className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-black/65">Hazardous material?</span>
+                  <select className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]">
+                    <option>No</option>
+                    <option>Yes</option>
+                    <option>Not sure</option>
+                  </select>
+                </label>
+              </div>
+
+              <label className="grid gap-2">
+                <span className="text-sm font-medium text-black/65">General list of items</span>
+                <textarea
+                  rows={5}
+                  className="rounded-2xl border border-black/10 bg-[#faf7f2] px-4 py-4 outline-none transition focus:border-[#8a4a17]"
+                  placeholder="Example: 1 couch, 10 bags of trash, branches from backyard, old washer and dryer..."
+                />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-sm font-medium text-black/65">Photo upload</span>
+                <input type="file" multiple className="rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white" />
+              </label>
+
+              <button
+                type="submit"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#8a4a17] px-6 text-base font-medium text-white shadow-[0_16px_35px_rgba(138,74,23,0.28)] transition hover:-translate-y-0.5"
+              >
+                Submit request
+                <Send className="h-4 w-4" />
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

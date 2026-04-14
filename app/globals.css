@@ -24,3 +24,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Match next/font Cormorant Garamond @font-face family names (layout.tsx). */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family:
+    "Cormorant Garamond",
+    "Cormorant Garamond Fallback",
+    ui-serif,
+    Georgia,
+    "Times New Roman",
+    serif;
+}
