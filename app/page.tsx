@@ -8,7 +8,7 @@ export default function Page() {
 
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ArrowRight,
   Clock3,
@@ -27,8 +27,6 @@ import {
   Trees,
   Bath,
   Send,
-  Menu,
-  X,
 } from 'lucide-react';
 
 function OdysseyHaulingPage() {
@@ -50,29 +48,9 @@ function OdysseyHaulingPage() {
 
   const [serviceToAdd, setServiceToAdd] = useState(selectablePricingOptions[0]?.label ?? '');
   const [serviceItems, setServiceItems] = useState<Array<{ label: string; quantity: number }>>([]);
-  const [navOpen, setNavOpen] = useState(false);
-
-  useEffect(() => {
-    if (!navOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setNavOpen(false);
-    };
-    document.documentElement.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.documentElement.style.overflow = '';
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [navOpen]);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const close = () => {
-      if (mq.matches) setNavOpen(false);
-    };
-    mq.addEventListener('change', close);
-    return () => mq.removeEventListener('change', close);
-  }, []);
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
+  const [contactSubmitMessage, setContactSubmitMessage] = useState<string | null>(null);
+  const [contactSubmitError, setContactSubmitError] = useState<string | null>(null);
 
   const addServiceItem = () => {
     if (!serviceToAdd) return;
@@ -114,6 +92,34 @@ function OdysseyHaulingPage() {
     const high = Math.max(minimumFee, subtotalHigh);
     return { items, subtotalLow, subtotalHigh, low, high };
   }, [serviceItems, pricingOptions, minimumFee]);
+
+  const handleContactSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setContactSubmitMessage(null);
+    setContactSubmitError(null);
+    setIsSubmittingContact(true);
+
+    try {
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Unable to submit your request right now.');
+      }
+
+      form.reset();
+      setContactSubmitMessage('Thanks! Your request was sent. We will get back to you soon.');
+    } catch (error) {
+      setContactSubmitError(error instanceof Error ? error.message : 'Unable to submit your request right now.');
+    } finally {
+      setIsSubmittingContact(false);
+    }
+  };
 
   const services = [
     { title: 'Hauling', icon: Truck, text: 'Fast, dependable hauling for everyday cleanup, property projects, and oversized items.' },
@@ -163,93 +169,8 @@ function OdysseyHaulingPage() {
     },
   ];
 
-  const navLinks = [
-    { href: '#services', label: 'Services' },
-    { href: '#process', label: 'How it works' },
-    { href: '#quote', label: 'Quote' },
-    { href: '#contact', label: 'Get started' },
-  ];
-
   return (
     <main className="min-h-screen bg-[#f7f1e7] text-[#171717]">
-      <header className="sticky top-0 z-50 border-b border-black/10 bg-[#f7f1e7]/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3.5 md:gap-6 md:px-10 md:py-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4 md:flex-initial">
-            <a href="#" className="flex shrink-0 items-center outline-offset-4 transition-opacity hover:opacity-90">
-              <Image
-                src="/odyssey-hauling-transparent.png"
-                alt="Odyssey Hauling LLC"
-                width={480}
-                height={270}
-                className="h-12 w-auto sm:h-14 md:h-16"
-                priority
-              />
-            </a>
-            <span
-              className="min-w-0 text-[11px] font-semibold uppercase leading-snug tracking-[0.14em] text-[#784821] sm:text-xs md:text-sm"
-              style={{
-                fontFamily: '"Cormorant Garamond", "Cormorant Garamond Fallback", ui-serif, Georgia, "Times New Roman", serif',
-              }}
-            >
-              <b>ODYSSEY HAULING LLC</b>
-            </span>
-          </div>
-
-          <nav
-            className="hidden min-w-0 flex-1 items-center justify-end gap-2 text-sm font-medium text-black/70 md:flex"
-            aria-label="Primary"
-          >
-            {navLinks.map(({ href, label }) => (
-              <a
-                key={href}
-                href={href}
-                className={
-                  href === '#contact'
-                    ? 'inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5'
-                    : 'shrink-0 rounded-lg px-2.5 py-2 transition-colors hover:bg-black/[0.04] hover:text-[#1b1b1b]'
-                }
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-
-          <button
-            type="button"
-            className="-mr-1 inline-flex shrink-0 items-center justify-center rounded-xl p-2.5 text-[#171717] transition-colors hover:bg-black/[0.06] md:hidden"
-            aria-expanded={navOpen}
-            aria-controls="site-mobile-nav"
-            onClick={() => setNavOpen((o) => !o)}
-          >
-            {navOpen ? <X className="h-6 w-6" strokeWidth={1.75} /> : <Menu className="h-6 w-6" strokeWidth={1.75} />}
-            <span className="sr-only">{navOpen ? 'Close menu' : 'Open menu'}</span>
-          </button>
-        </div>
-
-        {navOpen ? (
-          <div
-            id="site-mobile-nav"
-            className="border-t border-black/10 bg-[#f2ebe0]/98 px-6 py-4 shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site navigation"
-          >
-            <nav className="mx-auto flex max-w-7xl flex-col gap-0.5" aria-label="Primary mobile">
-              {navLinks.map(({ href, label }) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="rounded-xl px-3 py-3.5 text-base font-medium text-[#1b1b1b] transition-colors hover:bg-black/[0.05]"
-                  onClick={() => setNavOpen(false)}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-          </div>
-        ) : null}
-      </header>
-
       <section className="relative overflow-x-hidden border-b border-black/10 bg-[radial-gradient(circle_at_top,rgba(177,114,48,0.16),transparent_38%),linear-gradient(to_bottom,#f8f2e9,#f4ede2)]">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,.25) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 pt-0 pb-12 md:px-10 md:pb-16 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:gap-16 lg:py-24">
@@ -647,31 +568,66 @@ function OdysseyHaulingPage() {
           </div>
 
           <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.1)] sm:p-8">
-            <form className="grid gap-5">
+            <form className="grid gap-5" onSubmit={handleContactSubmit}>
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Full name</span>
-                  <input className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" placeholder="Your name" />
+                  <input
+                    name="fullName"
+                    required
+                    className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                    placeholder="Your name"
+                  />
                 </label>
                 <label className="grid gap-2">
+                  <span className="text-sm font-medium text-black/65">Email</span>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                    placeholder="you@example.com"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Phone</span>
-                  <input className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" placeholder="(555) 555-5555" />
+                  <input
+                    name="phone"
+                    required
+                    className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                    placeholder="(555) 555-5555"
+                  />
                 </label>
               </div>
 
               <label className="grid gap-2">
                 <span className="text-sm font-medium text-black/65">Location</span>
-                <input className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" placeholder="City or job address" />
+                <input
+                  name="location"
+                  required
+                  className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                  placeholder="City or job address"
+                />
               </label>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">When do you need it scheduled?</span>
-                  <input type="date" className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]" />
+                  <input
+                    name="scheduledDate"
+                    type="date"
+                    className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                  />
                 </label>
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Hazardous material?</span>
-                  <select className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]">
+                  <select
+                    name="hazardousMaterial"
+                    className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                  >
                     <option>No</option>
                     <option>Yes</option>
                     <option>Not sure</option>
@@ -682,6 +638,8 @@ function OdysseyHaulingPage() {
               <label className="grid gap-2">
                 <span className="text-sm font-medium text-black/65">General list of items</span>
                 <textarea
+                  name="itemList"
+                  required
                   rows={5}
                   className="rounded-2xl border border-black/10 bg-[#faf7f2] px-4 py-4 outline-none transition focus:border-[#8a4a17]"
                   placeholder="Example: 1 couch, 10 bags of trash, branches from backyard, old washer and dryer..."
@@ -690,20 +648,30 @@ function OdysseyHaulingPage() {
 
               <label className="grid gap-2">
                 <span className="text-sm font-medium text-black/65">Photo upload</span>
-                <input type="file" multiple className="rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white" />
+                <input
+                  name="photos"
+                  type="file"
+                  multiple
+                  className="rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white"
+                />
               </label>
+
+              {contactSubmitMessage ? <div className="text-sm font-medium text-green-700">{contactSubmitMessage}</div> : null}
+              {contactSubmitError ? <div className="text-sm font-medium text-red-700">{contactSubmitError}</div> : null}
 
               <button
                 type="submit"
+                disabled={isSubmittingContact}
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#8a4a17] px-6 text-base font-medium text-white shadow-[0_16px_35px_rgba(138,74,23,0.28)] transition hover:-translate-y-0.5"
               >
-                Submit request
+                {isSubmittingContact ? 'Sending...' : 'Submit request'}
                 <Send className="h-4 w-4" />
               </button>
             </form>
           </div>
         </div>
       </section>
+
     </main>
   );
 }
