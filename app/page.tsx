@@ -416,7 +416,7 @@ function OdysseyHaulingPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:p-8">
+            <div className="mx-auto w-full max-w-[25rem] rounded-[2rem] border border-black/10 bg-white p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:max-w-[26rem] sm:p-6 lg:mx-0 lg:max-w-none">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="text-sm uppercase tracking-[0.2em] text-black/40">Estimate builder</div>
@@ -466,16 +466,35 @@ function OdysseyHaulingPage() {
                               {item.low === item.high ? `$${item.low}` : `$${item.low}–$${item.high}`}
                             </div>
                           </div>
-                          <label className="flex items-center gap-2 text-sm text-black/65">
-                            Qty
-                            <input
-                              type="number"
-                              min={1}
-                              value={item.quantity}
-                              onChange={(e) => updateServiceQuantity(item.label, Number(e.target.value))}
-                              className="h-10 w-20 rounded-lg border border-black/10 bg-[#faf7f2] px-2 text-sm outline-none transition focus:border-[#8a4a17]"
-                            />
-                          </label>
+                          <div className="flex items-center gap-2 text-sm text-black/65">
+                            <span>Qty</span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => updateServiceQuantity(item.label, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-black/10 bg-[#faf7f2] text-base font-medium text-black/70 transition hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-45"
+                                aria-label={`Decrease ${item.label} quantity`}
+                              >
+                                -
+                              </button>
+                              <input
+                                type="number"
+                                min={1}
+                                value={item.quantity}
+                                onChange={(e) => updateServiceQuantity(item.label, Number(e.target.value))}
+                                className="h-10 w-20 rounded-lg border border-black/10 bg-[#faf7f2] px-2 text-sm outline-none transition focus:border-[#8a4a17]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => updateServiceQuantity(item.label, item.quantity + 1)}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-black/10 bg-[#faf7f2] text-base font-medium text-black/70 transition hover:bg-black/[0.04]"
+                                aria-label={`Increase ${item.label} quantity`}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
                           <button
                             type="button"
                             onClick={() => removeServiceItem(item.label)}
