@@ -8,7 +8,7 @@ export default function Page() {
 
 
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   Clock3,
@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 
 function OdysseyHaulingPage() {
+  const CLIENT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
   const pricingOptions = [
     { label: 'Minimum fee', low: 100, high: 100, category: 'Load-based' },
     { label: 'Half truckload', low: 150, high: 150, category: 'Load-based' },
@@ -51,6 +52,77 @@ function OdysseyHaulingPage() {
   const [isSubmittingContact, setIsSubmittingContact] = useState(false);
   const [contactSubmitMessage, setContactSubmitMessage] = useState<string | null>(null);
   const [contactSubmitError, setContactSubmitError] = useState<string | null>(null);
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [photoUploadProgress, setPhotoUploadProgress] = useState<number[]>([]);
+  const [isProcessingPhotos, setIsProcessingPhotos] = useState(false);
+  const [photoSizeWarning, setPhotoSizeWarning] = useState<string | null>(null);
+
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const withJpgName = (name: string) => {
+    if (/\.(jpe?g)$/i.test(name)) return name;
+    return name.replace(/\.[^/.]+$/, '') + '.jpg';
+  };
+
+  const compressImageFile = async (file: File) => {
+    if (!file.type.startsWith('image/') || file.size < 350 * 1024) return file;
+
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const image = new window.Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error('Unable to read selected image.'));
+        image.src = objectUrl;
+      });
+
+      const maxDimension = 1600;
+      const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
+      const width = Math.max(1, Math.round(img.width * scale));
+      const height = Math.max(1, Math.round(img.height * scale));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return file;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const compressedBlob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, 'image/jpeg', 0.78);
+      });
+
+      if (!compressedBlob || compressedBlob.size >= file.size) return file;
+
+      return new File([compressedBlob], withJpgName(file.name), {
+        type: 'image/jpeg',
+        lastModified: file.lastModified,
+      });
+    } catch {
+      return file;
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  const removeSelectedPhoto = (target: File) => {
+    if (isSubmittingContact) return;
+    setSelectedPhotos((prev) =>
+      prev.filter(
+        (file) =>
+          !(
+            file.name === target.name &&
+            file.size === target.size &&
+            file.lastModified === target.lastModified &&
+            file.type === target.type
+          ),
+      ),
+    );
+  };
 
   const addServiceItem = () => {
     if (!serviceToAdd) return;
@@ -97,22 +169,66 @@ function OdysseyHaulingPage() {
     event.preventDefault();
     setContactSubmitMessage(null);
     setContactSubmitError(null);
+    if (isProcessingPhotos) {
+      setContactSubmitError('Please wait for file processing to finish before submitting.');
+      return;
+    }
+    const totalUploadBytes = selectedPhotos.reduce((sum, file) => sum + file.size, 0);
+    if (totalUploadBytes > CLIENT_MAX_UPLOAD_BYTES) {
+      setContactSubmitError(`Selected files total ${formatBytes(totalUploadBytes)}. Please keep uploads under ${formatBytes(CLIENT_MAX_UPLOAD_BYTES)}.`);
+      return;
+    }
     setIsSubmittingContact(true);
 
     try {
       const form = event.currentTarget;
       const formData = new FormData(form);
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        body: formData,
+      formData.delete('photos');
+      selectedPhotos.forEach((file) => {
+        formData.append('photos', file);
       });
-      const result = (await response.json()) as { error?: string };
+      setPhotoUploadProgress(selectedPhotos.map(() => 0));
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Unable to submit your request right now.');
-      }
+      await new Promise<{ ok: boolean; error?: string }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const totalFileBytes = selectedPhotos.reduce((sum, file) => sum + file.size, 0);
+
+        xhr.open('POST', '/api/contact');
+        xhr.responseType = 'json';
+
+        xhr.upload.onprogress = (e) => {
+          if (!e.lengthComputable || selectedPhotos.length === 0) return;
+          const scaledLoaded = totalFileBytes > 0 ? (e.loaded / e.total) * totalFileBytes : e.loaded;
+          let offset = 0;
+          const perFileProgress = selectedPhotos.map((file) => {
+            const size = Math.max(1, file.size);
+            const loadedForFile = Math.min(size, Math.max(0, scaledLoaded - offset));
+            offset += size;
+            return Math.min(100, Math.round((loadedForFile / size) * 100));
+          });
+          setPhotoUploadProgress(perFileProgress);
+        };
+
+        xhr.onload = () => {
+          setPhotoUploadProgress(selectedPhotos.map(() => 100));
+          const response = (xhr.response ?? {}) as { error?: string };
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve({ ok: true });
+            return;
+          }
+          reject(new Error(response.error || 'Unable to submit your request right now.'));
+        };
+
+        xhr.onerror = () => {
+          reject(new Error('Network error while uploading files. Please try again.'));
+        };
+
+        xhr.send(formData);
+      });
 
       form.reset();
+      setSelectedPhotos([]);
+      setPhotoUploadProgress([]);
       setContactSubmitMessage('Thanks! Your request was sent. We will get back to you soon.');
     } catch (error) {
       setContactSubmitError(error instanceof Error ? error.message : 'Unable to submit your request right now.');
@@ -120,6 +236,15 @@ function OdysseyHaulingPage() {
       setIsSubmittingContact(false);
     }
   };
+
+  useEffect(() => {
+    const totalUploadBytes = selectedPhotos.reduce((sum, file) => sum + file.size, 0);
+    if (totalUploadBytes > CLIENT_MAX_UPLOAD_BYTES) {
+      setPhotoSizeWarning(`Selected files total ${formatBytes(totalUploadBytes)}. Keep uploads under ${formatBytes(CLIENT_MAX_UPLOAD_BYTES)}.`);
+    } else {
+      setPhotoSizeWarning(null);
+    }
+  }, [selectedPhotos]);
 
   const services = [
     { title: 'Hauling', icon: Truck, text: 'Fast, dependable hauling for everyday cleanup, property projects, and oversized items.' },
@@ -588,16 +713,17 @@ function OdysseyHaulingPage() {
 
           <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.1)] sm:p-8">
             <form className="grid gap-5" onSubmit={handleContactSubmit}>
+              <label className="grid gap-2">
+                <span className="text-sm font-medium text-black/65">Full name</span>
+                <input
+                  name="fullName"
+                  required
+                  className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
+                  placeholder="Your name"
+                />
+              </label>
+
               <div className="grid gap-5 sm:grid-cols-2">
-                <label className="grid gap-2">
-                  <span className="text-sm font-medium text-black/65">Full name</span>
-                  <input
-                    name="fullName"
-                    required
-                    className="h-14 rounded-2xl border border-black/10 bg-[#faf7f2] px-4 outline-none transition focus:border-[#8a4a17]"
-                    placeholder="Your name"
-                  />
-                </label>
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Email</span>
                   <input
@@ -608,9 +734,6 @@ function OdysseyHaulingPage() {
                     placeholder="you@example.com"
                   />
                 </label>
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Phone</span>
                   <input
@@ -671,19 +794,95 @@ function OdysseyHaulingPage() {
                   name="photos"
                   type="file"
                   multiple
-                  className="rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white"
+                  onChange={(e) => {
+                    const nextFiles = Array.from(e.currentTarget.files ?? []);
+                    if (nextFiles.length === 0) return;
+                    e.currentTarget.value = '';
+                    void (async () => {
+                      setIsProcessingPhotos(true);
+                      try {
+                        const processedFiles = await Promise.all(nextFiles.map(compressImageFile));
+                        setSelectedPhotos((prev) => {
+                          const merged = [...prev, ...processedFiles];
+                          const seen = new Set<string>();
+                          return merged.filter((file) => {
+                            const key = `${file.name}-${file.size}-${file.lastModified}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                          });
+                        });
+                      } finally {
+                        setIsProcessingPhotos(false);
+                      }
+                    })();
+                  }}
+                  className={`rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white ${
+                    selectedPhotos.length > 0 ? 'text-transparent' : ''
+                  }`}
                 />
+                {selectedPhotos.length > 0 ? (
+                  <div className="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-xs text-black/65">
+                    <div className="font-medium text-black/75">
+                      {selectedPhotos.length} file{selectedPhotos.length > 1 ? 's' : ''} selected
+                    </div>
+                    <div className="mt-0.5 text-black/60">Total size: {formatBytes(selectedPhotos.reduce((sum, file) => sum + file.size, 0))}</div>
+                    <ul className="mt-1 space-y-1">
+                      {selectedPhotos.map((file, index) => {
+                        const progress = photoUploadProgress[index] ?? 0;
+                        return (
+                          <li key={`${file.name}-${file.size}-${file.lastModified}-${index}`} className="space-y-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="truncate">- {file.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeSelectedPhoto(file)}
+                                disabled={isSubmittingContact}
+                                className="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-[11px] font-medium text-black/55 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                                aria-label={`Remove ${file.name}`}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                            {isSubmittingContact ? (
+                              <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10">
+                                <div
+                                  className="h-full rounded-full bg-[#8a4a17] transition-all duration-150"
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ) : null}
+                {isProcessingPhotos ? <div className="text-xs text-black/60">Optimizing selected images...</div> : null}
+                {photoSizeWarning ? <div className="text-xs font-medium text-red-700">{photoSizeWarning}</div> : null}
               </label>
+
+              <div className="hidden" aria-hidden="true">
+                <label htmlFor="website-field">Leave this field empty</label>
+                <input
+                  id="website-field"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="h-0 w-0 opacity-0"
+                />
+              </div>
 
               {contactSubmitMessage ? <div className="text-sm font-medium text-green-700">{contactSubmitMessage}</div> : null}
               {contactSubmitError ? <div className="text-sm font-medium text-red-700">{contactSubmitError}</div> : null}
 
               <button
                 type="submit"
-                disabled={isSubmittingContact}
+                disabled={isSubmittingContact || isProcessingPhotos || Boolean(photoSizeWarning)}
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#8a4a17] px-6 text-base font-medium text-white shadow-[0_16px_35px_rgba(138,74,23,0.28)] transition hover:-translate-y-0.5"
               >
-                {isSubmittingContact ? 'Sending...' : 'Submit request'}
+                {isProcessingPhotos ? 'Preparing files...' : isSubmittingContact ? 'Sending...' : 'Submit request'}
                 <Send className="h-4 w-4" />
               </button>
             </form>

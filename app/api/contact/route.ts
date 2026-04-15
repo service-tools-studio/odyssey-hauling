@@ -19,6 +19,11 @@ function clean(value: unknown) {
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
+    const honeypot = clean(formData.get('website'));
+
+    if (honeypot) {
+      return Response.json({ ok: true });
+    }
 
     const files = formData
       .getAll('photos')
