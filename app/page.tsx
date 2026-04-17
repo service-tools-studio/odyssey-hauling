@@ -42,7 +42,7 @@ function OdysseyHaulingPage() {
     { label: 'Box spring', low: 65, high: 150, category: 'Single items' },
     { label: 'Appliances', low: 75, high: 165, category: 'Single items' },
     { label: 'Hot tubs', low: 425, high: 795, category: 'Specialty jobs' },
-    { label: 'Shed removal', low: 495, high: 495, category: 'Specialty jobs', helper: 'Basic price based on a 5\'x5\' unit' },
+    { label: 'Shed removal', low: 495, high: 495, category: 'Specialty jobs', helper: 'Basic price based on a 5\'x5\' unit', priceDisplay: '$495+' },
   ];
   const selectablePricingOptions = pricingOptions.filter((item) => item.label !== 'Minimum fee');
   const minimumFee = pricingOptions.find((item) => item.label === 'Minimum fee')?.low ?? 100;
@@ -533,7 +533,11 @@ function OdysseyHaulingPage() {
                         {item.helper ? <div className="mt-1 text-black/55">{item.helper}</div> : null}
                       </div>
                       <div className="whitespace-nowrap font-semibold text-[#8a4a17]">
-                        {item.low === item.high ? `$${item.low}` : `$${item.low}–$${item.high}`}
+                        {'priceDisplay' in item && typeof item.priceDisplay === 'string'
+                          ? item.priceDisplay
+                          : item.low === item.high
+                            ? `$${item.low}`
+                            : `$${item.low}–$${item.high}`}
                       </div>
                     </div>
                   ))}
