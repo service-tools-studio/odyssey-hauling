@@ -252,7 +252,7 @@ function OdysseyHaulingPage() {
     { title: 'Hot Tub Removal', icon: Bath, text: 'Breakdown and haul-away for old hot tubs, with pricing based on size and access.' },
     { title: 'Shed Removal', icon: Home, text: 'Demolition and removal for small sheds and worn-out backyard structures.' },
     { title: 'Yard Debris', icon: Trees, text: 'Branches, brush, storm debris, leaves, and outdoor cleanup hauled away quickly.' },
-    { title: 'Clean Outs', icon: Package, text: 'Garage, storage unit, estate, rental, and move-out clean outs with clear communication.' },
+    { title: 'Clean Outs', icon: Package, text: 'Garage, storage unit, estate, rental, and property clean outs with clear communication.' },
     { title: 'Small Moving Jobs', icon: Sofa, text: 'Need help moving a few items across town? We handle smaller jobs with care.' },
     { title: 'Large Item Transport', icon: ArrowRight, text: 'Single-item and oversized-item transport for furniture, equipment, and more.' },
     { title: 'Construction Deliveries', icon: Hammer, text: 'Pickup and delivery for materials, jobsite items, and project-related transport.' },
@@ -382,7 +382,7 @@ function OdysseyHaulingPage() {
 
           <div className="rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm sm:p-8">
             <p className="text-lg leading-8 text-black/70">
-              Odyssey Hauling LLC is a reliable, locally owned hauling and junk removal service based in Beaverton, OR. We specialize in junk
+              Odyssey Hauling LLC is a reliable, locally owned hauling and junk removal service based in Beaverton, OR and servicing the greater Portland area. We specialize in junk
               removal, property cleanouts, and transporting large items. No job is too big or too small, and we are committed to handling every
               job with care and efficiency. Whether you are clearing out clutter, cleaning up a property, or need a hand with heavy lifting, we
               are here to help.
@@ -817,9 +817,8 @@ function OdysseyHaulingPage() {
                       }
                     })();
                   }}
-                  className={`rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white ${
-                    selectedPhotos.length > 0 ? 'text-transparent' : ''
-                  }`}
+                  className={`rounded-2xl border border-dashed border-black/15 bg-[#faf7f2] px-4 py-4 text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-[#111111] file:px-4 file:py-2 file:text-white ${selectedPhotos.length > 0 ? 'text-transparent' : ''
+                    }`}
                 />
                 {selectedPhotos.length > 0 ? (
                   <div className="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-xs text-black/65">
