@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Slightly smaller rem base: tightens type, spacing, and component scale site-wide. */
+html {
+  font-size: 92%;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -39,4 +44,23 @@ h6 {
     Georgia,
     "Times New Roman",
     serif;
+}
+
+@keyframes before-after-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-before-after-marquee {
+  animation: before-after-marquee 55s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-before-after-marquee {
+    animation: none;
+  }
 }

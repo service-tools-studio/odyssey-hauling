@@ -29,6 +29,15 @@ import {
   Send,
 } from 'lucide-react';
 
+const BEFORE_AFTER_IMAGES = [
+  '/IMG_5917.JPG',
+  '/IMG_5918.JPG',
+  '/IMG_5943.JPG',
+  '/IMG_6356.JPG',
+  '/IMG_6437.JPG',
+  '/IMG_6438.JPG',
+] as const;
+
 function OdysseyHaulingPage() {
   const CLIENT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
   const pricingOptions = [
@@ -56,6 +65,8 @@ function OdysseyHaulingPage() {
   const [photoUploadProgress, setPhotoUploadProgress] = useState<number[]>([]);
   const [isProcessingPhotos, setIsProcessingPhotos] = useState(false);
   const [photoSizeWarning, setPhotoSizeWarning] = useState<string | null>(null);
+  const [beforeAfterIndex, setBeforeAfterIndex] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -246,6 +257,22 @@ function OdysseyHaulingPage() {
     }
   }, [selectedPhotos]);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const onChange = () => setReducedMotion(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const id = window.setInterval(() => {
+      setBeforeAfterIndex((i) => (i + 1) % BEFORE_AFTER_IMAGES.length);
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [reducedMotion]);
+
   const services = [
     { title: 'Hauling', icon: Truck, text: 'Fast, dependable hauling for everyday cleanup, property projects, and oversized items.' },
     { title: 'Junk Removal', icon: Trash2, text: 'Furniture, clutter, bulk trash, and unwanted items cleared out without the hassle.' },
@@ -255,7 +282,13 @@ function OdysseyHaulingPage() {
     { title: 'Clean Outs', icon: Package, text: 'Garage, storage unit, estate, rental, and property clean outs with clear communication.' },
     { title: 'Small Moving Jobs', icon: Sofa, text: 'Need help moving a few items across town? We handle smaller jobs with care.' },
     { title: 'Large Item Transport', icon: ArrowRight, text: 'Single-item and oversized-item transport for furniture, equipment, and more.' },
-    { title: 'Construction Deliveries', icon: Hammer, text: 'Pickup and delivery for materials, jobsite items, and project-related transport.' },
+    {
+      title: 'Construction Deliveries',
+      icon: Hammer,
+      text: 'Pickup and delivery for materials, jobsite items, and project-related transport.',
+      image: '/odyssey-trailer.JPG',
+      imageAlt: 'Pickup truck towing a loaded utility trailer for construction and jobsite deliveries',
+    },
   ];
 
   const reviews = [
@@ -295,10 +328,10 @@ function OdysseyHaulingPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#f7f1e7] text-[#171717]">
+    <main className="min-h-screen bg-[#f7f1e7] text-[#171717] leading-relaxed antialiased">
       <section className="relative overflow-x-hidden border-b border-black/10 bg-[radial-gradient(circle_at_top,rgba(177,114,48,0.16),transparent_38%),linear-gradient(to_bottom,#f8f2e9,#f4ede2)]">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,.25) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 pt-0 pb-12 md:px-10 md:pb-16 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:gap-16 lg:py-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 pt-0 pb-16 sm:px-8 md:px-12 lg:px-14 md:pb-20 lg:grid-cols-[1.12fr_0.88fr] lg:items-start lg:gap-6 lg:pt-[50px] lg:pb-12 xl:gap-8 xl:pb-14">
           <div className="relative order-1 flex w-full max-w-none max-lg:left-1/2 max-lg:w-screen max-lg:-translate-x-1/2 max-lg:flex-col lg:contents lg:left-auto lg:w-auto lg:translate-x-0">
             <div className="relative isolate lg:order-2 lg:mx-auto lg:max-w-xl">
               <Image
@@ -325,7 +358,7 @@ function OdysseyHaulingPage() {
               </div>
             </div>
 
-            <div className="z-10 flex w-full min-w-0 shrink-0 flex-row gap-2 border-t border-black/10 bg-[#f7f1e7] px-5 py-3 sm:gap-3 md:px-10 lg:hidden">
+            <div className="z-10 flex w-full min-w-0 shrink-0 flex-row gap-2 border-t border-black/10 bg-[#f7f1e7] px-5 py-4 sm:gap-3 sm:px-8 md:px-12 lg:hidden">
               <a
                 href="#quote"
                 className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#111111] px-4 py-3 text-sm font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5 sm:px-5 sm:text-base"
@@ -344,13 +377,13 @@ function OdysseyHaulingPage() {
 
             {/* lg+: copy column (same text as overlay; only one column visible at a time) */}
             <div className="relative z-10 order-1 hidden lg:block">
-              <h1 className="max-w-3xl text-balance text-5xl font-semibold leading-[0.95] tracking-tight uppercase text-[#1b1b1b] sm:text-6xl lg:text-7xl">
+              <h1 className="max-w-3xl text-balance text-4xl font-semibold leading-[0.95] tracking-tight uppercase text-[#1b1b1b] sm:text-5xl lg:text-6xl">
                 When you need a <span className="text-[#8a4a17]">friend with a truck</span>.
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-black/70 sm:text-xl">
+              <p className="mt-8 max-w-2xl text-lg leading-8 text-black/70 sm:text-xl">
                 Hauling, junk removal, specialty pickups, and clean-outs with straightforward pricing, and fast scheduling.
               </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-5">
                 <a
                   href="#quote"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5"
@@ -371,54 +404,116 @@ function OdysseyHaulingPage() {
         </div>
       </section>
 
-      <section id="about" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <div className="max-w-2xl">
-            <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
-              About Odyssey
+      <section id="about" className="mx-auto max-w-7xl px-5 pb-[calc(6rem-30px)] pt-24 sm:px-8 md:px-12 md:pb-[calc(7rem-30px)] md:pt-28 lg:px-14 lg:pb-[calc(8rem-30px)] lg:pt-32">
+        <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-16">
+          <div className="flex w-full min-w-0 flex-col gap-10 lg:gap-12">
+            <div>
+              <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+                About Odyssey
+              </div>
+              <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">A reliable local team for hauling, cleanouts, and heavy lifting.</h2>
             </div>
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">A reliable local team for hauling, cleanouts, and heavy lifting.</h2>
+            <div className="rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm sm:p-10">
+              <p className="text-lg leading-8 text-black/70">
+                Odyssey Hauling LLC is a reliable, locally owned hauling and junk removal service based in Beaverton, OR and servicing the greater Portland area. We specialize in junk
+                removal, property cleanouts, and transporting large items. No job is too big or too small, and we are committed to handling every
+                job with care and efficiency. Whether you are clearing out clutter, cleaning up a property, or need a hand with heavy lifting, we
+                are here to help.
+              </p>
+              <p className="mt-5 text-lg leading-8 text-black/70">
+                We also strive to donate and recycle as much as possible. We work with different nonprofits and organizations to help give items a
+                second home.
+              </p>
+              <p className="mt-5 text-lg font-medium leading-8 text-[#1b1b1b]">
+                So if you need a friend with a truck, call Odyssey Hauling today for a free quote.
+              </p>
+            </div>
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:aspect-[4/5]">
+              <Image
+                src="/odyssey-dumpster.JPG"
+                alt="Residential junk removal load in an Odyssey Hauling dumpster"
+                fill
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                className="object-cover object-center"
+              />
+            </div>
           </div>
 
-          <div className="rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm sm:p-8">
-            <p className="text-lg leading-8 text-black/70">
-              Odyssey Hauling LLC is a reliable, locally owned hauling and junk removal service based in Beaverton, OR and servicing the greater Portland area. We specialize in junk
-              removal, property cleanouts, and transporting large items. No job is too big or too small, and we are committed to handling every
-              job with care and efficiency. Whether you are clearing out clutter, cleaning up a property, or need a hand with heavy lifting, we
-              are here to help.
-            </p>
-            <p className="mt-5 text-lg leading-8 text-black/70">
-              We also strive to donate and recycle as much as possible. We work with different nonprofits and organizations to help give items a
-              second home.
-            </p>
-            <p className="mt-5 text-lg font-medium leading-8 text-[#1b1b1b]">
-              So if you need a friend with a truck, call Odyssey Hauling today for a free quote.
-            </p>
+          <div className="flex w-full min-w-0 flex-col gap-8 lg:gap-10">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
+              <Image
+                src="/odyssey-wood.JPG"
+                alt="Odyssey Hauling team member at the facility with wood and debris ready for recycling"
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="relative aspect-[3/4] min-h-0 w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:aspect-[4/5]">
+              <Image
+                src="/odyssey-truckload.JPG"
+                alt="Odyssey Hauling truck loaded with junk removal and hauling debris"
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover object-center"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="services" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
+      <section id="services" className="mx-auto max-w-7xl px-5 pb-24 pt-[calc(6rem-30px)] sm:px-8 md:px-12 md:pb-28 md:pt-[calc(7rem-30px)] lg:px-14 lg:pb-32 lg:pt-[calc(8rem-30px)]">
         <div className="max-w-3xl">
-          <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+          <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
             Services
           </div>
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Reliable help for heavy, bulky, messy, and awkward jobs.</h2>
-          <p className="mt-4 max-w-2xl text-lg leading-8 text-black/65">
+          <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Reliable help for heavy, bulky, messy, and awkward jobs.</h2>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-black/65">
             Whether you need a few items gone, a full trailer load hauled away, or help moving something large, Odyssey Hauling keeps it simple.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {services.map((service) => {
             const Icon = service.icon;
-            return (
-              <div key={service.title} className="group rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+            const extra = service as typeof service & { image?: string; imageAlt?: string };
+            const photoSrc = typeof extra.image === 'string' ? extra.image : null;
+
+            const cardInner = (
+              <>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8a4a17]/10 text-[#8a4a17]">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-5 text-xl font-semibold">{service.title}</h3>
+                <h3 className="mt-5 text-lg font-semibold">{service.title}</h3>
                 <p className="mt-3 leading-7 text-black/65">{service.text}</p>
+              </>
+            );
+
+            if (photoSrc) {
+              return (
+                <div
+                  key={service.title}
+                  className="grid min-h-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch sm:gap-4 md:col-span-2 xl:col-span-3"
+                >
+                  <div className="group flex h-full min-h-0 min-w-0 flex-col rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                    {cardInner}
+                  </div>
+                  <div className="relative aspect-[4/3] min-h-0 w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_12px_30px_rgba(0,0,0,0.08)] sm:aspect-auto sm:min-h-0 sm:h-full">
+                    <Image
+                      src={photoSrc}
+                      alt={extra.imageAlt ?? ''}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div key={service.title} className="group rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                {cardInner}
               </div>
             );
           })}
@@ -426,22 +521,22 @@ function OdysseyHaulingPage() {
       </section>
 
       <section id="reviews" className="border-y border-black/10 bg-[#efe5d6]">
-        <div className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:px-12 lg:px-14 md:py-28 lg:py-32">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
                 Google Reviews
               </div>
-              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Trusted by local customers who needed it handled fast.</h2>
+              <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Trusted by local customers who needed it handled fast.</h2>
             </div>
             {/* <p className="max-w-xl text-base leading-7 text-black/65">
               Swap these placeholders with live Google reviews when ready, or connect this section to your review data later.
             </p> */}
           </div>
 
-          <div className="mt-10 grid gap-5 lg:grid-cols-3">
+          <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
             {reviews.map((review) => (
-              <div key={review.name} className="rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm">
+              <div key={review.name} className="rounded-[1.75rem] border border-black/10 bg-white p-8 shadow-sm">
                 <div className="flex gap-1 text-[#8a4a17]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-current" />
@@ -453,7 +548,7 @@ function OdysseyHaulingPage() {
             ))}
           </div>
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-12 flex justify-center">
             <a
               href="https://maps.app.goo.gl/41ami5wUUMZXM2xK8"
               target="_blank"
@@ -467,18 +562,98 @@ function OdysseyHaulingPage() {
         </div>
       </section>
 
-      <section id="process" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+      <section
+        id="before-after"
+        aria-label="Before and after project photos"
+        className="border-y border-black/10 bg-[#ebe3d4]"
+      >
+        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:px-12 lg:px-14 md:py-28 lg:py-32">
+          <div className="max-w-3xl">
+            <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              Results
+            </div>
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Before &amp; after</h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-black/65">
+              Real jobs, real transformations—garages, yards, interiors, and more cleared out efficiently.
+            </p>
+          </div>
+
+          {/* Mobile: one slide at a time, auto-advance */}
+          <div className="mt-14 lg:hidden">
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-black/5 shadow-[0_24px_60px_rgba(0,0,0,0.1)] aspect-[4/5] max-h-[min(70vh,540px)] w-full">
+              <div
+                className="flex h-full transition-transform duration-700 ease-out"
+                style={{ transform: `translateX(-${beforeAfterIndex * 100}%)` }}
+              >
+                {BEFORE_AFTER_IMAGES.map((src, idx) => (
+                  <div key={src} className="relative h-full min-w-full shrink-0">
+                    <Image
+                      src={src}
+                      alt={`Before and after hauling project ${idx + 1} of ${BEFORE_AFTER_IMAGES.length}`}
+                      fill
+                      sizes="(max-width: 640px) 92vw, (max-width: 1023px) 88vw"
+                      className="object-cover"
+                      priority={idx === 0}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-7 flex justify-center gap-2" role="tablist" aria-label="Select project photo">
+              {BEFORE_AFTER_IMAGES.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === beforeAfterIndex}
+                  aria-label={`Photo ${i + 1}`}
+                  className={`h-2.5 rounded-full transition-all ${
+                    i === beforeAfterIndex ? 'w-8 bg-[#8a4a17]' : 'w-2.5 bg-black/20 hover:bg-black/35'
+                  }`}
+                  onClick={() => setBeforeAfterIndex(i)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: continuous horizontal scroll */}
+          <div
+            className={`mt-14 hidden lg:block ${reducedMotion ? 'overflow-x-auto pb-2' : 'overflow-hidden'} [scrollbar-gutter:stable]`}
+          >
+            <div
+              className={`flex w-max gap-6 lg:gap-7 ${reducedMotion ? '' : 'animate-before-after-marquee'}`}
+            >
+              {[...BEFORE_AFTER_IMAGES, ...BEFORE_AFTER_IMAGES].map((src, idx) => (
+                <div
+                  key={`${src}-${idx}`}
+                  className="relative h-80 w-[min(22rem,calc((100vw-8rem)/3))] shrink-0 overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_20px_50px_rgba(0,0,0,0.12)]"
+                >
+                  <Image
+                    src={src}
+                    alt={`Before and after project ${(idx % BEFORE_AFTER_IMAGES.length) + 1}`}
+                    fill
+                    sizes="(max-width: 1280px) min(22rem, 32vw), 22rem"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="process" className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:px-12 lg:px-14 md:py-28 lg:py-32">
+        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-16">
           <div>
-            <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+            <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
               Process
             </div>
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">A simple process from photos to pickup day.</h2>
-            <p className="mt-4 max-w-xl text-lg leading-8 text-black/65">
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">A simple process from photos to pickup day.</h2>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-black/65">
               The goal is to quote quickly, schedule clearly, and make sure expectations are handled before the job starts.
             </p>
 
-            <div className="mt-8 rounded-[1.75rem] border border-black/10 bg-[#111111] p-6 text-white shadow-lg">
+            <div className="mt-10 rounded-[1.75rem] border border-black/10 bg-[#111111] p-8 text-white shadow-lg">
               <div className="flex items-start gap-4">
                 <Shield className="mt-1 h-5 w-5 flex-none text-[#d49a5a]" />
                 <p className="leading-7 text-white/80">
@@ -488,11 +663,11 @@ function OdysseyHaulingPage() {
             </div>
           </div>
 
-          <div className="grid gap-5">
+          <div className="grid gap-6 lg:gap-8">
             {process.map((step) => {
               const Icon = step.icon;
               return (
-                <div key={step.number} className="grid gap-4 rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm md:grid-cols-[auto_1fr] md:items-start">
+                <div key={step.number} className="grid gap-5 rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm md:grid-cols-[auto_1fr] md:items-start">
                   <div className="flex items-center gap-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8a4a17]/10 text-[#8a4a17]">
                       <Icon className="h-6 w-6" />
@@ -501,7 +676,7 @@ function OdysseyHaulingPage() {
                   </div>
                   <div>
                     <div className="hidden text-sm font-semibold uppercase tracking-[0.2em] text-black/35 md:block">Step {step.number}</div>
-                    <h3 className="mt-1 text-2xl font-semibold">{step.title}</h3>
+                    <h3 className="mt-1 text-xl font-semibold">{step.title}</h3>
                     <p className="mt-3 leading-8 text-black/65">{step.text}</p>
                   </div>
                 </div>
@@ -512,18 +687,18 @@ function OdysseyHaulingPage() {
       </section>
 
       <section id="quote" className="border-y border-black/10 bg-[linear-gradient(to_bottom,#f2e7d8,#efe3d1)]">
-        <div className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:px-12 lg:px-14 md:py-28 lg:py-32">
+          <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-16">
             <div>
-              <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white/80 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white/80 px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
                 Quote Calculator
               </div>
-              <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Quick estimate tool with flat-rate pricing.</h2>
-              <p className="mt-4 max-w-xl text-lg leading-8 text-black/65">
+              <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Quick estimate tool with flat-rate pricing.</h2>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-black/65">
                 This gives you a fast ballpark estimate before you send photos and job details for confirmation.
               </p>
 
-              <div className="mt-8 rounded-[1.75rem] border border-black/10 bg-white/80 p-6 shadow-sm">
+              <div className="mt-10 rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm">
                 <h3 className="text-lg font-semibold">Flat-rate pricing guide</h3>
                 <div className="mt-5 space-y-3 text-sm text-black/70">
                   {pricingOptions.map((item) => (
@@ -545,11 +720,11 @@ function OdysseyHaulingPage() {
               </div>
             </div>
 
-            <div className="mx-auto w-full max-w-[25rem] rounded-[2rem] border border-black/10 bg-white p-5 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:max-w-[26rem] sm:p-6 lg:mx-0 lg:max-w-none">
+            <div className="mx-auto w-full max-w-[25rem] rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:max-w-[26rem] sm:p-8 lg:mx-0 lg:max-w-none">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="text-sm uppercase tracking-[0.2em] text-black/40">Estimate builder</div>
-                  <h3 className="mt-2 text-2xl font-semibold">See your ballpark range</h3>
+                  <h3 className="mt-2 text-xl font-semibold">See your ballpark range</h3>
                 </div>
                 <div className="rounded-2xl bg-[#111111] px-4 py-3 text-right text-white">
                   <div className="text-xs uppercase tracking-[0.18em] text-white/50">Minimum</div>
@@ -557,7 +732,7 @@ function OdysseyHaulingPage() {
                 </div>
               </div>
 
-              <div className="mt-8 grid gap-5">
+              <div className="mt-10 grid gap-6">
                 <div className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Service items</span>
                   <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
@@ -639,9 +814,9 @@ function OdysseyHaulingPage() {
 
               </div>
 
-              <div className="mt-8 rounded-[1.75rem] bg-[#111111] p-6 text-white">
+              <div className="mt-10 rounded-[1.75rem] bg-[#111111] p-8 text-white">
                 <div className="text-sm uppercase tracking-[0.2em] text-white/50">Estimate</div>
-                <div className="mt-3 text-4xl font-semibold tracking-tight">
+                <div className="mt-3 text-3xl font-semibold tracking-tight">
                   {itemizedEstimate.low === itemizedEstimate.high
                     ? `$${itemizedEstimate.low}`
                     : `$${itemizedEstimate.low}–$${itemizedEstimate.high}`}
@@ -685,18 +860,18 @@ function OdysseyHaulingPage() {
         </div>
       </section>
 
-      <section id="contact" className="mx-auto max-w-7xl px-6 py-20 md:px-10">
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+      <section id="contact" className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:px-12 lg:px-14 md:py-28 lg:py-32">
+        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
-            <div className="mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+            <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
               Contact
             </div>
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Send the details and get the job moving.</h2>
-            <p className="mt-4 max-w-xl text-lg leading-8 text-black/65">
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Send the details and get the job moving.</h2>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-black/65">
               The fastest way to quote is with photos, your location, and a general list of what needs to go.
             </p>
 
-            <div className="mt-8 space-y-4">
+            <div className="mt-10 space-y-5">
               {[
                 { icon: MapPin, text: 'Include your location' },
                 { icon: Camera, text: 'Attach photos of the property or items' },
@@ -704,7 +879,7 @@ function OdysseyHaulingPage() {
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.text} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-4">
+                  <div key={item.text} className="flex items-center gap-4 rounded-2xl border border-black/10 bg-white/80 px-5 py-5">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#8a4a17]/10 text-[#8a4a17]">
                       <Icon className="h-4 w-4" />
                     </div>
@@ -715,8 +890,8 @@ function OdysseyHaulingPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.1)] sm:p-8">
-            <form className="grid gap-5" onSubmit={handleContactSubmit}>
+          <div className="rounded-[2rem] border border-black/10 bg-white p-8 shadow-[0_24px_60px_rgba(0,0,0,0.1)] sm:p-10">
+            <form className="grid gap-6" onSubmit={handleContactSubmit}>
               <label className="grid gap-2">
                 <span className="text-sm font-medium text-black/65">Full name</span>
                 <input
@@ -727,7 +902,7 @@ function OdysseyHaulingPage() {
                 />
               </label>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">Email</span>
                   <input
@@ -759,7 +934,7 @@ function OdysseyHaulingPage() {
                 />
               </label>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-black/65">When do you need it scheduled?</span>
                   <input

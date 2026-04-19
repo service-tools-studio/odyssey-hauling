@@ -38,7 +38,7 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-[#f7f1e7]/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3.5 md:gap-6 md:px-10 md:py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 md:gap-5 md:px-12 lg:px-14 md:py-3.5">
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5 md:flex-initial">
           <a href="/" className="flex shrink-0 items-center outline-offset-4 transition-opacity hover:opacity-90">
             <Image
@@ -46,12 +46,12 @@ export default function SiteHeader() {
               alt="Odyssey Hauling LLC"
               width={480}
               height={270}
-              className="h-12 w-auto sm:h-14 md:h-16"
+              className="h-9 w-auto sm:h-11 md:h-12"
               priority
             />
           </a>
           <span
-            className="min-w-0 text-[11px] font-semibold uppercase leading-snug tracking-[0.14em] text-[#784821] sm:text-xs md:text-sm"
+            className="min-w-0 text-[10px] font-semibold uppercase leading-snug tracking-[0.14em] text-[#784821] sm:text-[11px] md:text-xs"
             style={{
               fontFamily: '"Cormorant Garamond", "Cormorant Garamond Fallback", ui-serif, Georgia, "Times New Roman", serif',
             }}
@@ -60,15 +60,15 @@ export default function SiteHeader() {
           </span>
         </div>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-end gap-2 text-sm font-medium text-black/70 md:flex" aria-label="Primary">
+        <nav className="hidden min-w-0 flex-1 items-center justify-end gap-1.5 text-sm font-medium text-black/70 md:flex" aria-label="Primary">
           {navLinks.map(({ href, label }) => (
             <a
               key={href}
               href={href}
               className={
                 href === '/#contact'
-                  ? 'inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5'
-                  : 'shrink-0 rounded-lg px-2.5 py-2 transition-colors hover:bg-black/[0.04] hover:text-[#1b1b1b]'
+                  ? 'inline-flex items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 py-2.5 text-sm font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5'
+                  : 'shrink-0 rounded-lg px-2.5 py-1.5 transition-colors hover:bg-black/[0.04] hover:text-[#1b1b1b]'
               }
             >
               {label}
@@ -78,7 +78,7 @@ export default function SiteHeader() {
 
         <button
           type="button"
-          className="-mr-1 inline-flex shrink-0 items-center justify-center rounded-xl p-2.5 text-[#171717] transition-colors hover:bg-black/[0.06] md:hidden"
+          className="-mr-1 inline-flex shrink-0 items-center justify-center rounded-xl p-2 text-[#171717] transition-colors hover:bg-black/[0.06] md:hidden"
           aria-expanded={navOpen}
           aria-controls="site-mobile-nav"
           onClick={() => setNavOpen((o) => !o)}
@@ -91,7 +91,7 @@ export default function SiteHeader() {
       {navOpen ? (
         <div
           id="site-mobile-nav"
-          className="border-t border-black/10 bg-[#f2ebe0]/98 px-6 py-4 shadow-[0_12px_24px_rgba(0,0,0,0.06)] md:hidden"
+          className="border-t border-black/10 bg-[#f2ebe0]/98 px-5 py-5 shadow-[0_12px_24px_rgba(0,0,0,0.06)] sm:px-8 md:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"

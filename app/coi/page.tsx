@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function CoiPage() {
   return (
-    <main className="min-h-screen bg-[#f7f1e7] px-4 py-8 text-[#171717] sm:px-6 md:px-10">
+    <main className="min-h-screen bg-[#f7f1e7] px-5 py-12 text-[#171717] leading-relaxed antialiased sm:px-8 md:px-12 lg:px-14 md:py-16">
       <div className="mx-auto max-w-6xl">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Certificate of Insurance</h1>
