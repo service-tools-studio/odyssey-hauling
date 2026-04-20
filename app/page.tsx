@@ -333,7 +333,7 @@ function OdysseyHaulingPage() {
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,.25) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 pt-0 pb-16 sm:px-8 md:px-12 lg:px-14 md:pb-20 lg:grid-cols-[1.12fr_0.88fr] lg:items-start lg:gap-6 lg:pt-[50px] lg:pb-12 xl:gap-8 xl:pb-14">
           <div className="relative order-1 flex w-full max-w-none max-lg:left-1/2 max-lg:w-screen max-lg:-translate-x-1/2 max-lg:flex-col lg:contents lg:left-auto lg:w-auto lg:translate-x-0">
-            <div className="relative isolate lg:order-2 lg:mx-auto lg:max-w-xl">
+            <div className="relative isolate lg:-mt-4 lg:order-2 lg:mx-auto lg:max-w-xl xl:-mt-6">
               <Image
                 src="/odessey-hero-darkened.svg"
                 alt="Briton and truck for Odyssey Hauling LLC"
@@ -376,7 +376,7 @@ function OdysseyHaulingPage() {
             </div>
 
             {/* lg+: copy column (same text as overlay; only one column visible at a time) */}
-            <div className="relative z-10 order-1 hidden lg:block">
+            <div className="relative z-10 order-1 hidden lg:mt-12 lg:block">
               <h1 className="max-w-3xl text-balance text-4xl font-semibold leading-[0.95] tracking-tight uppercase text-[#1b1b1b] sm:text-5xl lg:text-6xl">
                 When you need a <span className="text-[#8a4a17]">friend with a truck</span>.
               </h1>
