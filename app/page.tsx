@@ -599,19 +599,19 @@ function OdysseyHaulingPage() {
 
           {/* Mobile: one slide at a time, auto-advance */}
           <div className="mt-14 lg:hidden">
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-black/5 shadow-[0_24px_60px_rgba(0,0,0,0.1)] aspect-[4/5] max-h-[min(70vh,540px)] w-full">
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.1)] aspect-[4/5] max-h-[min(70vh,540px)] w-full">
               <div
                 className="flex h-full transition-transform duration-700 ease-out"
                 style={{ transform: `translateX(-${beforeAfterIndex * 100}%)` }}
               >
                 {BEFORE_AFTER_IMAGES.map((src, idx) => (
-                  <div key={src} className="relative h-full min-w-full shrink-0">
+                  <div key={src} className="relative h-full min-w-full shrink-0 bg-black">
                     <Image
                       src={src}
                       alt={`Before and after hauling project ${idx + 1} of ${BEFORE_AFTER_IMAGES.length}`}
                       fill
                       sizes="(max-width: 640px) 92vw, (max-width: 1023px) 88vw"
-                      className="object-cover"
+                      className="object-contain"
                       priority={idx === 0}
                     />
                   </div>
