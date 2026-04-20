@@ -404,73 +404,95 @@ function OdysseyHaulingPage() {
         </div>
       </section>
 
-      <section id="about" className="mx-auto max-w-7xl px-5 pb-[calc(6rem-30px)] pt-24 sm:px-8 md:px-12 md:pb-[calc(7rem-30px)] md:pt-28 lg:px-14 lg:pb-[calc(8rem-30px)] lg:pt-32">
-        <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-16">
-          <div className="flex w-full min-w-0 flex-col gap-10 lg:gap-12">
-            <div>
+      <section className="relative overflow-hidden bg-[#f7f4ef] py-24">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+            {/* Left Content */}
+            <div className="max-w-2xl">
               <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
                 About Odyssey
               </div>
-              <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">A reliable local team for hauling, cleanouts, and heavy lifting.</h2>
-            </div>
-            <div className="rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm sm:p-10">
-              <p className="text-lg leading-8 text-black/70">
-                Odyssey Hauling LLC is a reliable, locally owned hauling and junk removal service based in Beaverton, OR and servicing the greater Portland area. We specialize in junk
-                removal, property cleanouts, and transporting large items. No job is too big or too small, and we are committed to handling every
-                job with care and efficiency. Whether you are clearing out clutter, cleaning up a property, or need a hand with heavy lifting, we
-                are here to help.
-              </p>
-              <p className="mt-5 text-lg leading-8 text-black/70">
-                We also strive to donate and recycle as much as possible. We work with different nonprofits and organizations to help give items a
-                second home.
-              </p>
-              <p className="mt-5 text-lg font-medium leading-8 text-[#1b1b1b]">
-                So if you need a friend with a truck, call Odyssey Hauling today for a free quote.
-              </p>
-            </div>
-            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:aspect-[4/5]">
-              <Image
-                src="/odyssey-dumpster.JPG"
-                alt="Residential junk removal load in an Odyssey Hauling dumpster"
-                fill
-                sizes="(max-width: 1024px) 100vw, 42vw"
-                className="object-cover object-center"
-              />
-            </div>
-          </div>
 
-          <div className="flex w-full min-w-0 flex-col gap-8 lg:gap-10">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
-              <Image
-                src="/odyssey-wood.JPG"
-                alt="Odyssey Hauling team member at the facility with wood and debris ready for recycling"
-                fill
-                sizes="(max-width: 1024px) 100vw, 45vw"
-                className="object-cover"
-              />
+              <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+                A reliable local team for hauling, cleanouts, and heavy lifting.
+              </h2>
+
+              <div className="mt-8 space-y-6 text-lg leading-8 text-[#4b4b4b]">
+                <p>
+                  Odyssey Hauling LLC is a reliable, locally owned hauling and junk
+                  removal service based in Beaverton, OR and servicing the greater
+                  Portland area. We specialize in junk removal, property cleanouts,
+                  and transporting large items.
+                </p>
+
+                <p>
+                  No job is too big or too small, and we are committed to handling
+                  every job with care and efficiency. Whether you are clearing out
+                  clutter, cleaning up a property, or need a hand with heavy lifting,
+                  we are here to help.
+                </p>
+
+                <p>
+                  We also strive to donate and recycle as much as possible. We work
+                  with different nonprofits and organizations to help give items a
+                  second home.
+                </p>
+
+                <p>
+                  So if you need a friend with a truck, call Odyssey Hauling today
+                  for a free quote.
+                </p>
+              </div>
             </div>
-            <div className="relative aspect-[3/4] min-h-0 w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:aspect-[4/5]">
-              <Image
-                src="/odyssey-truckload.JPG"
-                alt="Odyssey Hauling truck loaded with junk removal and hauling debris"
-                fill
-                sizes="(max-width: 1024px) 100vw, 45vw"
-                className="object-cover object-center"
-              />
+
+            {/* Right Images */}
+            <div className="relative">
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="overflow-hidden rounded-[2rem] shadow-2xl">
+                  <img
+                    src="/odyssey-wood.JPG"
+                    alt="Odyssey Hauling team member standing in front of reclaimed wood and debris"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <div className="overflow-hidden rounded-[2rem] shadow-2xl">
+                  <img
+                    src="/odyssey-dumpster.JPG"
+                    alt="Dumpster full of debris and junk removal materials"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Decorative Background Accent */}
+              <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#d8e6d2] blur-3xl opacity-60" />
+              <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-[#e7ddd0] blur-3xl opacity-60" />
             </div>
           </div>
         </div>
       </section>
 
       <section id="services" className="mx-auto max-w-7xl px-5 pb-24 pt-[calc(6rem-30px)] sm:px-8 md:px-12 md:pb-28 md:pt-[calc(7rem-30px)] lg:px-14 lg:pb-32 lg:pt-[calc(8rem-30px)]">
-        <div className="max-w-3xl">
-          <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
-            Services
+        <div className="flex items-start justify-between gap-6">
+          <div className="max-w-3xl">
+            <div className="mb-5 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm uppercase tracking-[0.2em] text-[#8a4a17]">
+              Services
+            </div>
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Reliable help for heavy, bulky, messy, and awkward jobs.</h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-black/65">
+              Whether you need a few items gone, a full trailer load hauled away, or help moving something large, Odyssey Hauling keeps it simple.
+            </p>
           </div>
-          <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Reliable help for heavy, bulky, messy, and awkward jobs.</h2>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-black/65">
-            Whether you need a few items gone, a full trailer load hauled away, or help moving something large, Odyssey Hauling keeps it simple.
-          </p>
+          <div className="relative hidden h-[176px] w-[320px] shrink-0 overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm md:block">
+            <Image
+              src="/odyssey-trailer.JPG"
+              alt="Odyssey Hauling truck and trailer"
+              fill
+              sizes="320px"
+              className="object-cover"
+            />
+          </div>
         </div>
 
         <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -491,23 +513,11 @@ function OdysseyHaulingPage() {
 
             if (photoSrc) {
               return (
-                <div
-                  key={service.title}
-                  className="grid min-h-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch sm:gap-4 md:col-span-2 xl:col-span-3"
-                >
-                  <div className="group flex h-full min-h-0 min-w-0 flex-col rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                [
+                  <div key={`${service.title}-card`} className="group rounded-[1.75rem] border border-black/10 bg-white/80 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     {cardInner}
-                  </div>
-                  <div className="relative aspect-[4/3] min-h-0 w-full overflow-hidden rounded-[1.75rem] border border-black/10 shadow-[0_12px_30px_rgba(0,0,0,0.08)] sm:aspect-auto sm:min-h-0 sm:h-full">
-                    <Image
-                      src={photoSrc}
-                      alt={extra.imageAlt ?? ''}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 50vw"
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
+                  </div>,
+                ]
               );
             }
 
@@ -517,6 +527,15 @@ function OdysseyHaulingPage() {
               </div>
             );
           })}
+          <div className="group relative aspect-[4/3] min-h-0 w-full overflow-hidden rounded-[1.75rem] border border-black/10 bg-white/80 shadow-sm transition hover:-translate-y-1 hover:shadow-lg md:hidden">
+            <Image
+              src="/odyssey-trailer.JPG"
+              alt="Odyssey Hauling truck and trailer"
+              fill
+              sizes="(max-width: 768px) 92vw, 264px"
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 
@@ -573,7 +592,7 @@ function OdysseyHaulingPage() {
               Results
             </div>
             <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Before &amp; after</h2>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-black/65">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-black/65">
               Real jobs, real transformations—garages, yards, interiors, and more cleared out efficiently.
             </p>
           </div>
@@ -607,9 +626,8 @@ function OdysseyHaulingPage() {
                   role="tab"
                   aria-selected={i === beforeAfterIndex}
                   aria-label={`Photo ${i + 1}`}
-                  className={`h-2.5 rounded-full transition-all ${
-                    i === beforeAfterIndex ? 'w-8 bg-[#8a4a17]' : 'w-2.5 bg-black/20 hover:bg-black/35'
-                  }`}
+                  className={`h-2.5 rounded-full transition-all ${i === beforeAfterIndex ? 'w-8 bg-[#8a4a17]' : 'w-2.5 bg-black/20 hover:bg-black/35'
+                    }`}
                   onClick={() => setBeforeAfterIndex(i)}
                 />
               ))}
