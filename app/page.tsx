@@ -331,24 +331,24 @@ function OdysseyHaulingPage() {
     <main className="min-h-screen bg-[#f7f1e7] text-[#171717] leading-relaxed antialiased">
       <section className="relative overflow-x-hidden border-b border-black/10 bg-[radial-gradient(circle_at_top,rgba(177,114,48,0.16),transparent_38%),linear-gradient(to_bottom,#f8f2e9,#f4ede2)]">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,.25) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 pt-0 pb-16 sm:px-8 md:px-12 lg:px-14 md:pb-20 lg:grid-cols-[1.12fr_0.88fr] lg:items-start lg:gap-6 lg:pt-[50px] lg:pb-12 xl:gap-8 xl:pb-14">
-          <div className="relative order-1 flex w-full max-w-none max-lg:left-1/2 max-lg:w-screen max-lg:-translate-x-1/2 max-lg:flex-col lg:contents lg:left-auto lg:w-auto lg:translate-x-0">
-            <div className="relative isolate lg:-mt-4 lg:order-2 lg:mx-auto lg:max-w-xl xl:-mt-6">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 pt-0 pb-16 sm:px-8 md:px-12 lg:px-14 md:grid-cols-[1.12fr_0.88fr] md:items-start md:gap-6 md:pt-[50px] md:pb-12 xl:gap-8 xl:pb-14">
+          <div className="relative order-1 flex w-full max-w-none max-md:left-1/2 max-md:w-screen max-md:-translate-x-1/2 max-md:flex-col md:contents md:left-auto md:w-auto md:translate-x-0">
+            <div className="relative isolate md:-mt-4 md:order-2 md:mx-auto md:max-w-xl xl:-mt-6">
               <Image
                 src="/odessey-hero-darkened.svg"
                 alt="Briton and truck for Odyssey Hauling LLC"
                 width={1200}
                 height={1200}
-                className="h-auto w-full max-lg:rounded-none object-contain lg:rounded-2xl"
+                className="h-auto w-full max-md:rounded-none object-contain md:rounded-2xl"
                 priority
               />
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-1/3 bg-gradient-to-b from-black/70 via-black/45 via-[55%] to-transparent lg:hidden"
+                className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-1/3 bg-gradient-to-b from-black/70 via-black/45 via-[55%] to-transparent md:hidden"
               />
 
               {/* Mobile / tablet: title + blurb centered in top third of image */}
-              <div className="absolute inset-x-0 top-0 z-10 flex h-1/3 min-h-0 flex-col items-center justify-center gap-2 overflow-y-auto overscroll-contain px-4 py-2 text-center text-white lg:hidden">
+              <div className="absolute inset-x-0 top-0 z-10 flex h-1/3 min-h-0 flex-col items-center justify-center gap-2 overflow-y-auto overscroll-contain px-4 py-2 text-center text-white md:hidden">
                 <h1 className="w-full max-w-xl shrink-0 text-balance font-semibold tracking-tight text-[clamp(1.45rem,6.2vw,2.05rem)] leading-[1.06] text-white sm:max-w-2xl sm:text-[clamp(1.55rem,5.2vw,2.2rem)]">
                   When you need a <span className="text-[#f2d9a8]">friend with a truck</span>.
                 </h1>
@@ -358,7 +358,7 @@ function OdysseyHaulingPage() {
               </div>
             </div>
 
-            <div className="z-10 flex w-full min-w-0 shrink-0 flex-row gap-2 border-t border-black/10 bg-[#f7f1e7] px-5 py-4 sm:gap-3 sm:px-8 md:px-12 lg:hidden">
+            <div className="z-10 flex w-full min-w-0 shrink-0 flex-row gap-2 border-t border-black/10 bg-[#f7f1e7] px-5 py-4 sm:gap-3 sm:px-8 md:px-12 md:hidden">
               <a
                 href="#quote"
                 className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#111111] px-4 py-3 text-sm font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.15)] transition hover:-translate-y-0.5 sm:px-5 sm:text-base"
@@ -376,7 +376,7 @@ function OdysseyHaulingPage() {
             </div>
 
             {/* lg+: copy column (same text as overlay; only one column visible at a time) */}
-            <div className="relative z-10 order-1 hidden lg:mt-12 lg:block">
+            <div className="relative z-10 order-1 hidden md:block md:self-center">
               <h1 className="max-w-3xl text-balance text-4xl font-semibold leading-[0.95] tracking-tight uppercase text-[#1b1b1b] sm:text-5xl lg:text-6xl">
                 When you need a <span className="text-[#8a4a17]">friend with a truck</span>.
               </h1>
