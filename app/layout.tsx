@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "Odyssey Hauling LLC",
     images: [
       {
-        url: "/Odyssey Hauling LOGO.jpg",
+        url: "/Odyssey Hauling LOGO.webp",
       },
     ],
   },

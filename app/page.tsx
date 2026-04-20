@@ -30,12 +30,12 @@ import {
 } from 'lucide-react';
 
 const BEFORE_AFTER_IMAGES = [
-  '/IMG_5917.JPG',
-  '/IMG_5918.JPG',
-  '/IMG_5943.JPG',
-  '/IMG_6356.JPG',
-  '/IMG_6437.JPG',
-  '/IMG_6438.JPG',
+  '/IMG_5917.webp',
+  '/IMG_5918.webp',
+  '/IMG_5943.webp',
+  '/IMG_6356.webp',
+  '/IMG_6437.webp',
+  '/IMG_6438.webp',
 ] as const;
 
 function OdysseyHaulingPage() {
@@ -286,7 +286,7 @@ function OdysseyHaulingPage() {
       title: 'Construction Deliveries',
       icon: Hammer,
       text: 'Pickup and delivery for materials, jobsite items, and project-related transport.',
-      image: '/odyssey-trailer.JPG',
+      image: '/odyssey-trailer.webp',
       imageAlt: 'Pickup truck towing a loaded utility trailer for construction and jobsite deliveries',
     },
   ];
@@ -450,7 +450,7 @@ function OdysseyHaulingPage() {
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="overflow-hidden rounded-[2rem] shadow-2xl">
                   <img
-                    src="/odyssey-wood.JPG"
+                    src="/odyssey-wood.webp"
                     alt="Odyssey Hauling team member standing in front of reclaimed wood and debris"
                     className="h-full w-full object-cover"
                   />
@@ -458,9 +458,9 @@ function OdysseyHaulingPage() {
 
                 <div className="overflow-hidden rounded-[2rem] shadow-2xl">
                   <img
-                    src="/odyssey-dumpster.JPG"
+                    src="/odyssey-dumpster.webp"
                     alt="Dumpster full of debris and junk removal materials"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full origin-center object-cover [transform:rotate(90deg)_scale(1.35)]"
                   />
                 </div>
               </div>
@@ -486,7 +486,7 @@ function OdysseyHaulingPage() {
           </div>
           <div className="relative hidden h-[176px] w-[320px] shrink-0 overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm md:block">
             <Image
-              src="/odyssey-trailer.JPG"
+              src="/odyssey-trailer.webp"
               alt="Odyssey Hauling truck and trailer"
               fill
               sizes="320px"
@@ -529,7 +529,7 @@ function OdysseyHaulingPage() {
           })}
           <div className="group relative aspect-[4/3] min-h-0 w-full overflow-hidden rounded-[1.75rem] border border-black/10 bg-white/80 shadow-sm transition hover:-translate-y-1 hover:shadow-lg md:hidden">
             <Image
-              src="/odyssey-trailer.JPG"
+              src="/odyssey-trailer.webp"
               alt="Odyssey Hauling truck and trailer"
               fill
               sizes="(max-width: 768px) 92vw, 264px"
