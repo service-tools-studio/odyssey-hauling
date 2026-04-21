@@ -584,7 +584,7 @@ function OdysseyHaulingPage() {
       <section
         id="before-after"
         aria-label="Before and after project photos"
-        className="border-y border-black/10 bg-[#ebe3d4]"
+        className="overflow-x-hidden border-y border-black/10 bg-[#ebe3d4]"
       >
         <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 md:px-12 lg:px-14 md:py-28 lg:py-32">
           <div className="max-w-3xl">
@@ -597,28 +597,30 @@ function OdysseyHaulingPage() {
             </p>
           </div>
 
-          {/* Mobile: one slide at a time, auto-advance */}
+          {/* Mobile: one slide at a time, auto-advance — full viewport width (break out of section padding) */}
           <div className="mt-14 lg:hidden">
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.1)] aspect-[4/5] max-h-[min(70vh,540px)] w-full">
-              <div
-                className="flex h-full transition-transform duration-700 ease-out"
-                style={{ transform: `translateX(-${beforeAfterIndex * 100}%)` }}
-              >
-                {BEFORE_AFTER_IMAGES.map((src, idx) => (
-                  <div key={src} className="relative h-full min-w-full shrink-0 bg-black">
-                    <Image
-                      src={src}
-                      alt={`Before and after hauling project ${idx + 1} of ${BEFORE_AFTER_IMAGES.length}`}
-                      fill
-                      sizes="(max-width: 640px) 92vw, (max-width: 1023px) 88vw"
-                      className="object-contain"
-                      priority={idx === 0}
-                    />
-                  </div>
-                ))}
+            <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2">
+              <div className="relative aspect-[4/5] max-h-[min(70vh,540px)] w-full overflow-hidden rounded-none border-y border-black/10 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.1)]">
+                <div
+                  className="flex h-full transition-transform duration-700 ease-out"
+                  style={{ transform: `translateX(-${beforeAfterIndex * 100}%)` }}
+                >
+                  {BEFORE_AFTER_IMAGES.map((src, idx) => (
+                    <div key={src} className="relative h-full min-w-full shrink-0 bg-black">
+                      <Image
+                        src={src}
+                        alt={`Before and after hauling project ${idx + 1} of ${BEFORE_AFTER_IMAGES.length}`}
+                        fill
+                        sizes="100vw"
+                        className="object-contain"
+                        priority={idx === 0}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="mt-7 flex justify-center gap-2" role="tablist" aria-label="Select project photo">
+            <div className="mt-7 flex justify-center gap-2 px-5" role="tablist" aria-label="Select project photo">
               {BEFORE_AFTER_IMAGES.map((_, i) => (
                 <button
                   key={i}
