@@ -1,7 +1,5 @@
 import nodemailer from 'nodemailer';
 
-const TO_EMAIL = 'service.tools.studio@gmail.com';
-
 type ContactPayload = {
   fullName: string;
   email: string;
@@ -82,6 +80,7 @@ export async function POST(request: Request) {
     });
 
     const from = process.env.CONTACT_FROM || user;
+    const to = process.env.CONTACT_TO || 'service.tools.studio@gmail.com';
     const subject = `New Odyssey Hauling quote request: ${payload.fullName}`;
     const photoFileNames = files.map((file) => file.name);
     const photoFiles = photoFileNames.length > 0 ? photoFileNames.join(', ') : 'None provided';
@@ -110,7 +109,7 @@ export async function POST(request: Request) {
     await transporter.sendMail({
       from: `"${payload.fullName}" <${payload.email}>`,
       sender: from,
-      to: TO_EMAIL,
+      to,
       subject,
       text,
       replyTo: payload.email,
