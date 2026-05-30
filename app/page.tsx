@@ -67,6 +67,9 @@ function OdysseyHaulingPage() {
   const [photoSizeWarning, setPhotoSizeWarning] = useState<string | null>(null);
   const [beforeAfterIndex, setBeforeAfterIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [contactFormStartedAt, setContactFormStartedAt] = useState(() => Date.now());
+
+  const MIN_CONTACT_SUBMIT_MS = 3_000;
 
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -189,6 +192,10 @@ function OdysseyHaulingPage() {
       setContactSubmitError(`Selected files total ${formatBytes(totalUploadBytes)}. Please keep uploads under ${formatBytes(CLIENT_MAX_UPLOAD_BYTES)}.`);
       return;
     }
+    if (Date.now() - contactFormStartedAt < MIN_CONTACT_SUBMIT_MS) {
+      setContactSubmitError('Please take a moment to complete the form before submitting.');
+      return;
+    }
     setIsSubmittingContact(true);
 
     try {
@@ -238,6 +245,7 @@ function OdysseyHaulingPage() {
       });
 
       form.reset();
+      setContactFormStartedAt(Date.now());
       setSelectedPhotos([]);
       setPhotoUploadProgress([]);
       setContactSubmitMessage('Thanks! Your request was sent. We will get back to you soon.');
@@ -1060,17 +1068,7 @@ function OdysseyHaulingPage() {
                 {photoSizeWarning ? <div className="text-xs font-medium text-red-700">{photoSizeWarning}</div> : null}
               </label>
 
-              <div className="hidden" aria-hidden="true">
-                <label htmlFor="website-field">Leave this field empty</label>
-                <input
-                  id="website-field"
-                  name="website"
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  className="h-0 w-0 opacity-0"
-                />
-              </div>
+              <input type="hidden" name="formStartedAt" value={contactFormStartedAt} />
 
               {contactSubmitMessage ? <div className="text-sm font-medium text-green-700">{contactSubmitMessage}</div> : null}
               {contactSubmitError ? <div className="text-sm font-medium text-red-700">{contactSubmitError}</div> : null}

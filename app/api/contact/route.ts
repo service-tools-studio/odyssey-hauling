@@ -14,13 +14,38 @@ function clean(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+const MIN_SUBMIT_MS = 3_000;
+const MAX_SUBMIT_MS = 24 * 60 * 60 * 1000;
+
+function validateSubmitTiming(formData: FormData) {
+  const startedAtRaw = clean(formData.get('formStartedAt'));
+  const startedAt = Number(startedAtRaw);
+  const now = Date.now();
+
+  if (!startedAtRaw || !Number.isFinite(startedAt) || startedAt > now + 60_000) {
+    return { ok: false as const, error: 'Unable to verify submission. Please refresh and try again.' };
+  }
+
+  const elapsed = now - startedAt;
+
+  if (elapsed < MIN_SUBMIT_MS) {
+    return { ok: false as const, error: 'Please take a moment to review your request before submitting.' };
+  }
+
+  if (elapsed > MAX_SUBMIT_MS) {
+    return { ok: false as const, error: 'This form session has expired. Please refresh and try again.' };
+  }
+
+  return { ok: true as const };
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const honeypot = clean(formData.get('website'));
+    const timing = validateSubmitTiming(formData);
 
-    if (honeypot) {
-      return Response.json({ ok: true });
+    if (!timing.ok) {
+      return Response.json({ error: timing.error }, { status: 400 });
     }
 
     const files = formData
